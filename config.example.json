@@ -1,0 +1,44 @@
+{
+  "chatbot": {
+    "base_url": "mon-api.example.com",
+    "use_case_id": "mon-use-case",
+    "token": "${CHATBOT_TOKEN}",
+    "auth_header": "Authorization",
+    "auth_scheme": "Bearer",
+    "extra_headers": {},
+    "timeout": 60,
+    "max_retries": 3,
+    "verify_ssl": true,
+    "concurrency": 4
+  },
+  "dataset_path": "examples/golden_dataset_example.xlsx",
+  "dataset_sheet": null,
+  "output_path": "outputs/eval_{timestamp}.xlsx",
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "judge_model": "llama3.1:8b",
+    "embedding_model": "nomic-embed-text",
+    "temperature": 0.0
+  },
+  "metrics_concurrency": 2,
+  "custom_metrics_modules": ["examples/custom_metrics.py"],
+  "metrics": [
+    { "type": "exact_match", "params": { "ignore_case": true, "strip_punctuation": true } },
+    { "type": "contains", "name": "mots_cles", "params": { "substrings_column": "expected_keywords", "mode": "all" } },
+    { "type": "not_contains", "name": "pas_d_excuses", "params": { "substrings": ["je ne sais pas", "désolé"] } },
+    { "type": "regex_match", "name": "contient_un_prix", "params": { "pattern": "\\d+(,\\d+)? ?€" } },
+    { "type": "max_length", "params": { "max_chars": 800 } },
+    { "type": "semantic_similarity", "threshold": 0.8 },
+    { "type": "correctness", "threshold": 0.6 },
+    { "type": "answer_relevancy", "threshold": 0.7 },
+    {
+      "type": "geval",
+      "name": "ton_professionnel",
+      "threshold": 0.7,
+      "params": {
+        "criteria": "La réponse adopte-t-elle un ton professionnel, courtois et vouvoie-t-elle l'utilisateur ?",
+        "evaluation_params": ["input", "actual_output"]
+      }
+    }
+  ]
+}
